@@ -55,11 +55,7 @@ public class SetPremiumCommand extends Subcommand {
             // Notify target player
             if (premium) {
                 target.sendSystemMessage(Component.literal(
-                    "§a¡Un administrador te ha dado acceso premium al Pase de Batalla!"
-                ));
-            } else {
-                target.sendSystemMessage(Component.literal(
-                    "§cTu acceso premium al Pase de Batalla ha sido removido."
+                    "§a¡Recibiste acceso premium al pase de batalla! ¡Gracias por apoyar al servidor!"
                 ));
             }
 

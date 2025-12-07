@@ -64,7 +64,7 @@ public class Constants {
     public static final String MSG_ALREADY_CLAIMED = ERROR_PREFIX + "¡Ya reclamaste esta recompensa!";
     public static final String MSG_ALREADY_CLAIMED_LEVEL = ERROR_PREFIX + "¡Ya reclamaste la recompensa del nivel §e%d§f!";
     public static final String MSG_LEVEL_NOT_REACHED = ERROR_PREFIX + "¡Aún no has alcanzado el nivel §e%d§f!";
-    public static final String MSG_NOT_PREMIUM = ERROR_PREFIX + "¡Esta es una recompensa premium! Contacta a un administrador para obtener acceso premium.";
+    public static final String MSG_NOT_PREMIUM = ERROR_PREFIX + "¡Obtén el pase de batalla premium apoyando en la tienda del servidor! §estore.cobblemonespañol.es";
     public static final String MSG_CONFIG_RELOADED = SUCCESS_PREFIX + "¡Configuración recargada!";
     
     // Season Messages
