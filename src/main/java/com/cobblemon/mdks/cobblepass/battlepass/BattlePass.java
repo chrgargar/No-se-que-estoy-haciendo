@@ -46,11 +46,12 @@ public class BattlePass {
     public void loadPlayerPass(String uuid) {
         String filename = uuid + ".json";
         String content = Utils.readFileSync(Constants.PLAYER_DATA_DIR, filename);
-        
+        UUID playerId = UUID.fromString(uuid); // Optimización: parsear UUID solo una vez
+
         if (content == null || content.isEmpty()) {
             // Create new player pass if file doesn't exist
-            PlayerBattlePass newPass = new PlayerBattlePass(UUID.fromString(uuid));
-            playerPasses.put(UUID.fromString(uuid), newPass);
+            PlayerBattlePass newPass = new PlayerBattlePass(playerId);
+            playerPasses.put(playerId, newPass);
             // Save the new pass immediately
             savePlayerPass(uuid);
             return;
@@ -58,9 +59,9 @@ public class BattlePass {
 
         try {
             JsonObject json = JsonParser.parseString(content).getAsJsonObject();
-            PlayerBattlePass pass = new PlayerBattlePass(UUID.fromString(uuid));
+            PlayerBattlePass pass = new PlayerBattlePass(playerId);
             pass.fromJson(json);
-            playerPasses.put(UUID.fromString(uuid), pass);
+            playerPasses.put(playerId, pass);
             CobblePass.LOGGER.debug("Loaded battle pass for " + uuid + " with level " + pass.getLevel() + " and XP " + pass.getXP());
         } catch (Exception e) {
             CobblePass.LOGGER.error("Failed to load battle pass for " + uuid, e);
@@ -68,11 +69,12 @@ public class BattlePass {
     }
 
     public void savePlayerPass(String uuid) {
-        PlayerBattlePass pass = playerPasses.get(UUID.fromString(uuid));
+        UUID playerId = UUID.fromString(uuid); // Optimización: parsear UUID solo una vez
+        PlayerBattlePass pass = playerPasses.get(playerId);
         if (pass != null) {
             String filename = uuid + ".json";
             Utils.writeFileSync(Constants.PLAYER_DATA_DIR, filename,
-                    Utils.newGson().toJson(pass.toJson()));
+                    Utils.getGson().toJson(pass.toJson())); // Optimización: usar singleton Gson
             CobblePass.LOGGER.debug("Saved battle pass for " + uuid + " with level " + pass.getLevel() + " and XP " + pass.getXP());
         }
     }

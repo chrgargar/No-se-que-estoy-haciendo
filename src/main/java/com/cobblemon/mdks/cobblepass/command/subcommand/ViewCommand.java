@@ -1,36 +1,33 @@
 package com.cobblemon.mdks.cobblepass.command.subcommand;
 
-import com.google.gson.JsonObject;
 import ca.landonjw.gooeylibs2.api.UIManager;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
-import com.cobblemon.mdks.cobblepass.data.Reward;
 import ca.landonjw.gooeylibs2.api.button.Button;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import ca.landonjw.gooeylibs2.api.button.PlaceholderButton;
 import ca.landonjw.gooeylibs2.api.button.linked.LinkedPageButton;
 import ca.landonjw.gooeylibs2.api.button.linked.LinkType;
-import ca.landonjw.gooeylibs2.api.helpers.PaginationHelper;
 import ca.landonjw.gooeylibs2.api.page.LinkedPage;
-import ca.landonjw.gooeylibs2.api.page.Page;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 import com.cobblemon.mdks.cobblepass.CobblePass;
 import com.cobblemon.mdks.cobblepass.battlepass.BattlePassTier;
 import com.cobblemon.mdks.cobblepass.battlepass.PlayerBattlePass;
+import com.cobblemon.mdks.cobblepass.data.Reward;
 import com.cobblemon.mdks.cobblepass.util.Constants;
 import com.cobblemon.mdks.cobblepass.util.Subcommand;
-import com.cobblemon.mdks.cobblepass.util.Utils;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.util.Unit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +144,7 @@ public class ViewCommand extends Subcommand {
         
         // Create info button showing level, XP and time remaining
         int currentXP = pass.getXP();
-        int xpForNext = (int)(CobblePass.config.getXpPerLevel() * Math.pow(Constants.XP_MULTIPLIER, pass.getLevel() - 1));
+        int xpForNext = PlayerBattlePass.calculateXPForLevel(pass.getLevel());
         List<Component> infoLore = new ArrayList<>(Arrays.asList(
             Component.literal(String.format("§3Nivel: §f%d", pass.getLevel())),
             Component.literal(String.format("§3XP: §f%d§7/§f%d", currentXP, xpForNext))

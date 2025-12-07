@@ -21,12 +21,22 @@ import java.util.function.Consumer;
  * Utility methods for common operations
  */
 public class Utils {
+    // Gson singleton - optimización para evitar crear instancias repetidamente
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     /**
-     * Create a new Gson instance with pretty printing
+     * Returns the singleton Gson instance with pretty printing enabled
      */
+    public static Gson getGson() {
+        return GSON;
+    }
+
+    /**
+     * @deprecated Use {@link #getGson()} instead
+     */
+    @Deprecated
     public static Gson newGson() {
-        return new GsonBuilder().setPrettyPrinting().create();
+        return getGson();
     }
 
     /**

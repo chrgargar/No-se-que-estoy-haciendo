@@ -47,6 +47,16 @@ public class PlayerBattlePass {
     }
 
     private int getXPForNextLevel() {
+        return calculateXPForLevel(level);
+    }
+
+    /**
+     * Calcula el XP necesario para un nivel específico usando la fórmula exponencial.
+     * Método estático centralizado para evitar duplicación de código.
+     * @param level El nivel para calcular XP
+     * @return XP necesario para ese nivel
+     */
+    public static int calculateXPForLevel(int level) {
         return (int)(CobblePass.config.getXpPerLevel() * Math.pow(Constants.XP_MULTIPLIER, level - 1));
     }
 
