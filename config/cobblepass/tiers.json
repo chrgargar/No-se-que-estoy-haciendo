@@ -1,0 +1,112 @@
+{
+  "tiers": [
+    {
+      "level": 1,
+      "freeReward": {
+        "type": "COBBLEMON_ITEM",
+        "data": {
+          "id": "cobblemon:poke_ball",
+          "Count": 5
+        },
+        "title": "§a⚪ Recompensa Inicial",
+        "lore": [
+          "§aRecompensa Gratis",
+          "§75x Poké Ball",
+          "§8¡Empieza tu aventura!"
+        ]
+      }
+    },
+    {
+      "level": 2,
+      "freeReward": {
+        "type": "MINECRAFT_ITEM",
+        "data": {
+          "id": "minecraft:iron_ingot",
+          "Count": 10
+        }
+      }
+    },
+    {
+      "level": 3,
+      "freeReward": {
+        "type": "COBBLEMON_ITEM",
+        "data": {
+          "id": "cobblemon:basic_potion",
+          "Count": 2
+        }
+      }
+    },
+    {
+      "level": 4,
+      "freeReward": {
+        "type": "MINECRAFT_ITEM",
+        "data": {
+          "id": "minecraft:golden_carrot",
+          "Count": 3
+        }
+      }
+    },
+    {
+      "level": 5,
+      "premiumReward": {
+        "type": "COBBLEMON_ITEM",
+        "data": {
+          "id": "cobblemon:evolution_stone",
+          "Type": "random",
+          "Count": 1
+        }
+      }
+    },
+    {
+      "level": 6,
+      "freeReward": {
+        "type": "MINECRAFT_ITEM",
+        "data": {
+          "id": "minecraft:redstone",
+          "Count": 8
+        }
+      }
+    },
+    {
+      "level": 7,
+      "freeReward": {
+        "type": "COBBLEMON_ITEM",
+        "data": {
+          "id": "cobblemon:great_ball",
+          "Count": 2
+        }
+      }
+    },
+    {
+      "level": 8,
+      "freeReward": {
+        "type": "COBBLEMON_ITEM",
+        "data": {
+          "id": "cobblemon:exp_share",
+          "Count": 1
+        }
+      }
+    },
+    {
+      "level": 9,
+      "freeReward": {
+        "type": "MINECRAFT_ITEM",
+        "data": {
+          "id": "minecraft:gold_ingot",
+          "Count": 8
+        }
+      }
+    },
+    {
+      "level": 10,
+      "premiumReward": {
+        "type": "POKEMON",
+        "data": {
+          "species": "charmander",
+          "level": 15,
+          "shiny": false
+        }
+      }
+    }
+  ]
+}

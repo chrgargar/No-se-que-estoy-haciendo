@@ -1,0 +1,168 @@
+package com.cobblemon.mdks.cobblepass.config;
+
+import com.cobblemon.mdks.cobblepass.CobblePass;
+import com.cobblemon.mdks.cobblepass.util.Constants;
+import com.cobblemon.mdks.cobblepass.util.Utils;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+public class Config {
+    private int maxLevel;
+    private int xpPerLevel;
+    private int catchXP;
+    private int defeatXP;
+    private int evolveXP;
+    private int levelUpXP;
+    private long premiumCost;
+    private int seasonDurationDays;
+    private int currentSeason;
+    private long seasonStartTime;
+    private long seasonEndTime;
+    private boolean enablePermissionNodes;
+    private double xpMultiplier;
+
+    public Config() {
+        setDefaults();
+    }
+
+    private void setDefaults() {
+        generateDefaultConfig();
+    }
+
+    private void generateDefaultConfig() {
+        this.maxLevel = Constants.DEFAULT_MAX_LEVEL;
+        this.xpPerLevel = Constants.DEFAULT_XP_PER_LEVEL;
+        this.catchXP = Constants.DEFAULT_CATCH_XP;
+        this.defeatXP = Constants.DEFAULT_DEFEAT_XP;
+        this.evolveXP = Constants.DEFAULT_EVOLVE_XP;
+        this.levelUpXP = Constants.DEFAULT_LEVELUP_XP;
+        this.premiumCost = Constants.DEFAULT_PREMIUM_COST;
+        this.seasonDurationDays = 60;
+        this.currentSeason = 0;
+        this.seasonStartTime = 0;
+        this.seasonEndTime = 0;
+        this.enablePermissionNodes = Constants.DEFAULT_ENABLE_PERMISSION_NODES;
+        this.xpMultiplier = Constants.XP_MULTIPLIER;
+    }
+
+    public void load() {
+        // Ensure config directory exists
+        Utils.checkForDirectory("/" + Constants.CONFIG_PATH);
+        
+        String content = Utils.readFileSync(Constants.CONFIG_PATH, Constants.CONFIG_FILE);
+        if (content == null || content.isEmpty()) {
+            generateDefaultConfig();
+            save();
+            return;
+        }
+
+        try {
+            JsonObject json = JsonParser.parseString(content).getAsJsonObject();
+            loadFromJson(json);
+        } catch (Exception e) {
+            CobblePass.LOGGER.error("Failed to load config", e);
+            setDefaults();
+            save();
+        }
+    }
+
+    private void loadFromJson(JsonObject json) {
+        maxLevel = getOrDefault(json, "maxLevel", Constants.DEFAULT_MAX_LEVEL);
+        xpPerLevel = getOrDefault(json, "xpPerLevel", Constants.DEFAULT_XP_PER_LEVEL);
+        catchXP = getOrDefault(json, "catchXP", Constants.DEFAULT_CATCH_XP);
+        defeatXP = getOrDefault(json, "defeatXP", Constants.DEFAULT_DEFEAT_XP);
+        evolveXP = getOrDefault(json, "evolveXP", Constants.DEFAULT_EVOLVE_XP);
+        levelUpXP = getOrDefault(json, "levelUpXP", Constants.DEFAULT_LEVELUP_XP);
+        premiumCost = getOrDefault(json, "premiumCost", Constants.DEFAULT_PREMIUM_COST);
+        seasonDurationDays = getOrDefault(json, "seasonDurationDays", 60);
+        currentSeason = getOrDefault(json, "currentSeason", 0);
+        seasonStartTime = getOrDefault(json, "seasonStartTime", 0L);
+        seasonEndTime = getOrDefault(json, "seasonEndTime", 0L);
+        enablePermissionNodes = getOrDefault(json, "enablePermissionNodes", Constants.DEFAULT_ENABLE_PERMISSION_NODES);
+        xpMultiplier = getOrDefault(json, "xpMultiplier", Constants.XP_MULTIPLIER);
+    }
+
+    private <T> T getOrDefault(JsonObject json, String key, T defaultValue) {
+        if (!json.has(key)) return defaultValue;
+        
+        JsonElement element = json.get(key);
+        if (defaultValue instanceof String) {
+            return (T) element.getAsString();
+        } else if (defaultValue instanceof Integer) {
+            return (T) Integer.valueOf(element.getAsInt());
+        } else if (defaultValue instanceof Long) {
+            return (T) Long.valueOf(element.getAsLong());
+        } else if (defaultValue instanceof Boolean) {
+            return (T) Boolean.valueOf(element.getAsBoolean());
+        }
+        return defaultValue;
+    }
+
+    public void save() {
+        // Ensure config directory exists
+        Utils.checkForDirectory("/" + Constants.CONFIG_PATH);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("maxLevel", maxLevel);
+        json.addProperty("xpPerLevel", xpPerLevel);
+        json.addProperty("catchXP", catchXP);
+        json.addProperty("defeatXP", defeatXP);
+        json.addProperty("evolveXP", evolveXP);
+        json.addProperty("levelUpXP", levelUpXP);
+        json.addProperty("premiumCost", premiumCost);
+        json.addProperty("seasonDurationDays", seasonDurationDays);
+        json.addProperty("currentSeason", currentSeason);
+        json.addProperty("seasonStartTime", seasonStartTime);
+        json.addProperty("seasonEndTime", seasonEndTime);
+        json.addProperty("enablePermissionNodes", enablePermissionNodes);
+        json.addProperty("xpMultiplier", xpMultiplier);
+
+        Utils.writeFileSync(Constants.CONFIG_PATH, Constants.CONFIG_FILE,
+                Utils.newGson().toJson(json));
+    }
+
+    // Getters
+    public int getMaxLevel() { return maxLevel; }
+    public int getXpPerLevel() { return xpPerLevel; }
+    public int getCatchXP() { return catchXP; }
+    public int getDefeatXP() { return defeatXP; }
+    public int getEvolveXP() { return evolveXP; }
+    public int getLevelUpXP() { return levelUpXP; }
+    public long getPremiumCost() { return premiumCost; }
+    public int getCurrentSeason() { return currentSeason; }
+    public boolean isEnablePermissionNodes() { return enablePermissionNodes; }
+    public double getXpMultiplier() { return xpMultiplier; }
+    
+    public void startNewSeason() {
+        int previousSeason = currentSeason;
+        currentSeason++;
+        seasonStartTime = System.currentTimeMillis();
+        seasonEndTime = seasonStartTime + (seasonDurationDays * Constants.MILLIS_PER_DAY);
+        save();
+
+        // Reset all player data when starting a new season
+        if (previousSeason != currentSeason) {
+            CobblePass.LOGGER.info("Starting new season " + currentSeason + " (previous: " + previousSeason + ")");
+            CobblePass.battlePass.resetAllPlayerData();
+            CobblePass.LOGGER.info("Season " + currentSeason + " started successfully with fresh player data");
+        }
+    }
+
+    public void endCurrentSeason() {
+        seasonEndTime = System.currentTimeMillis();
+        save();
+    }
+
+    public boolean isSeasonActive() {
+        return seasonStartTime > 0 && System.currentTimeMillis() < seasonEndTime;
+    }
+
+    public long getSeasonEndTime() {
+        return seasonEndTime;
+    }
+
+    public long getSeasonStartTime() {
+        return seasonStartTime;
+    }
+}

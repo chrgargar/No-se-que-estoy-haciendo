@@ -1,0 +1,58 @@
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gooeylibs-wiki.md
+cline_docs/
+.idea
+/cobblemon-api-helper
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.idea/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+GTSexample.md
+cline_task_dec-28-2024_3-11-34-pm.md
+commands.md
+apihelp.md
+GTSimpactor.md
+.idea/runConfigurations/Minecraft_Server.xml
+.idea/runConfigurations/Minecraft_Server.xml
+.idea/runConfigurations/Minecraft_Server.xml
+cobblemon-api-helper/package.json
+cobblemon-api-helper/package-lock.json
+cobblemon-api-helper/src/index.ts
