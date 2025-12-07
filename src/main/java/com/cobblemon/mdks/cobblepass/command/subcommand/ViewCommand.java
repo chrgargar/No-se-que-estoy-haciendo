@@ -249,10 +249,21 @@ public class ViewCommand extends Subcommand {
                     freeDisplayItem = new ItemStack(Items.STONE);
                 }
 
+                // Use custom title if available, otherwise use default
+                Reward freeReward = tier.getFreeReward();
+                String displayTitle = (freeReward != null && freeReward.hasCustomTitle())
+                    ? freeReward.getCustomTitle()
+                    : "§fNivel " + level;
+
+                // Use custom lore if available, otherwise generate default lore
+                List<Component> displayLore = (freeReward != null && freeReward.hasCustomLore())
+                    ? freeReward.getCustomLore().stream().map(Component::literal).collect(java.util.stream.Collectors.<Component>toList())
+                    : getRewardLore(tier, false);
+
                 freeRewardButton = GooeyButton.builder()
                     .display(freeDisplayItem)
-                    .with(DataComponents.CUSTOM_NAME, Component.literal("§fNivel " + level))
-                    .with(DataComponents.LORE, new ItemLore(getRewardLore(tier, false)))
+                    .with(DataComponents.CUSTOM_NAME, Component.literal(displayTitle))
+                    .with(DataComponents.LORE, new ItemLore(displayLore))
                     .with(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
                     .onClick(action -> {
                         if (level > pass.getLevel()) {
@@ -314,10 +325,21 @@ public class ViewCommand extends Subcommand {
                 premiumDisplayItem = new ItemStack(Items.DIAMOND);
             }
 
+            // Use custom title if available, otherwise use default
+            Reward premiumReward = tier.getPremiumReward();
+            String premiumDisplayTitle = (premiumReward != null && premiumReward.hasCustomTitle())
+                ? premiumReward.getCustomTitle()
+                : "§6Nivel " + level;
+
+            // Use custom lore if available, otherwise generate default lore
+            List<Component> premiumDisplayLore = (premiumReward != null && premiumReward.hasCustomLore())
+                ? premiumReward.getCustomLore().stream().map(Component::literal).collect(java.util.stream.Collectors.<Component>toList())
+                : getRewardLore(tier, true);
+
             Button premiumRewardButton = GooeyButton.builder()
                 .display(premiumDisplayItem)
-                .with(DataComponents.CUSTOM_NAME, Component.literal("§6Nivel " + level))
-                .with(DataComponents.LORE, new ItemLore(getRewardLore(tier, true)))
+                .with(DataComponents.CUSTOM_NAME, Component.literal(premiumDisplayTitle))
+                .with(DataComponents.LORE, new ItemLore(premiumDisplayLore))
                 .with(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
                 .onClick(action -> {
                     if (level > pass.getLevel()) {
