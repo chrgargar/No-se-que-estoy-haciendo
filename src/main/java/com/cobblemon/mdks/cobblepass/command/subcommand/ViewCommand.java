@@ -13,6 +13,7 @@ import com.cobblemon.mdks.cobblepass.battlepass.BattlePassTier;
 import com.cobblemon.mdks.cobblepass.battlepass.PlayerBattlePass;
 import com.cobblemon.mdks.cobblepass.data.Reward;
 import com.cobblemon.mdks.cobblepass.util.Constants;
+import com.cobblemon.mdks.cobblepass.util.ItemStackCache;
 import com.cobblemon.mdks.cobblepass.util.Subcommand;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
@@ -20,8 +21,6 @@ import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
@@ -182,24 +181,16 @@ public class ViewCommand extends Subcommand {
             .with(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
             .build();
 
-        // Create premium status button
+        // Create premium status button - usando caché optimizado
         ItemStack premiumDisplay;
         if (pass.isPremium()) {
             // Premium active - show Luxury Ball
-            try {
-                CompoundTag luxuryTag = TagParser.parseTag("{id:\"cobblemon:luxury_ball\",Count:1}");
-                premiumDisplay = ItemStack.parse(player.level().registryAccess(), luxuryTag).orElse(new ItemStack(Items.GOLDEN_APPLE));
-            } catch (Exception e) {
-                premiumDisplay = new ItemStack(Items.GOLDEN_APPLE);
-            }
+            premiumDisplay = ItemStackCache.getCachedItem("luxury_ball",
+                player.level().registryAccess(), new ItemStack(Items.GOLDEN_APPLE));
         } else {
             // Not premium - show regular Poké Ball
-            try {
-                CompoundTag pokeballTag = TagParser.parseTag("{id:\"cobblemon:poke_ball\",Count:1}");
-                premiumDisplay = ItemStack.parse(player.level().registryAccess(), pokeballTag).orElse(new ItemStack(Items.APPLE));
-            } catch (Exception e) {
-                premiumDisplay = new ItemStack(Items.APPLE);
-            }
+            premiumDisplay = ItemStackCache.getCachedItem("poke_ball",
+                player.level().registryAccess(), new ItemStack(Items.APPLE));
         }
 
         List<Component> premiumLore = new ArrayList<>();
@@ -239,13 +230,9 @@ public class ViewCommand extends Subcommand {
             Button freeRewardButton;
 
             if (tier.hasFreeReward()) {
-                ItemStack freeDisplayItem;
-                try {
-                    CompoundTag pokeballTag = TagParser.parseTag("{id:\"cobblemon:poke_ball\",Count:1}");
-                    freeDisplayItem = ItemStack.parse(player.level().registryAccess(), pokeballTag).orElse(new ItemStack(Items.STONE));
-                } catch (Exception e) {
-                    freeDisplayItem = new ItemStack(Items.STONE);
-                }
+                // Usar caché para evitar parseo repetido
+                ItemStack freeDisplayItem = ItemStackCache.getCachedItem("poke_ball",
+                    player.level().registryAccess(), new ItemStack(Items.STONE));
 
                 // Use custom title if available, otherwise use default
                 Reward freeReward = tier.getFreeReward();
@@ -314,14 +301,9 @@ public class ViewCommand extends Subcommand {
                 .with(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
                 .build();
 
-            // Create PREMIUM reward button (Citrine Ball with enchantment glint)
-            ItemStack premiumDisplayItem;
-            try {
-                CompoundTag citrineTag = TagParser.parseTag("{id:\"cobblemon:citrine_ball\",Count:1,components:{\"minecraft:enchantment_glint_override\":true}}");
-                premiumDisplayItem = ItemStack.parse(player.level().registryAccess(), citrineTag).orElse(new ItemStack(Items.DIAMOND));
-            } catch (Exception e) {
-                premiumDisplayItem = new ItemStack(Items.DIAMOND);
-            }
+            // Create PREMIUM reward button (Citrine Ball with enchantment glint) - usando caché
+            ItemStack premiumDisplayItem = ItemStackCache.getCachedItem("citrine_ball",
+                player.level().registryAccess(), new ItemStack(Items.DIAMOND));
 
             // Use custom title if available, otherwise use default
             Reward premiumReward = tier.getPremiumReward();

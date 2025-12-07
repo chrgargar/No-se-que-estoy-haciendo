@@ -12,6 +12,7 @@ import com.cobblemon.mdks.cobblepass.listeners.CatchPokemonListener;
 import com.cobblemon.mdks.cobblepass.listeners.DefeatPokemonListener;
 import com.cobblemon.mdks.cobblepass.listeners.EvolvePokemonListener;
 import com.cobblemon.mdks.cobblepass.listeners.LevelUpPokemonListener;
+import com.cobblemon.mdks.cobblepass.listeners.PlayerDisconnectListener;
 import com.cobblemon.mod.common.api.Priority;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ public class CobblePass implements ModInitializer {
             DefeatPokemonListener.register();
             EvolvePokemonListener.register();
             LevelUpPokemonListener.register();
+            PlayerDisconnectListener.register();
         });
 
         // Register player join event
