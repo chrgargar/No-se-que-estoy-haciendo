@@ -14,6 +14,7 @@ public class Config {
     private int defeatXP;
     private int evolveXP;
     private int levelUpXP;
+    private int firstCatchXP;
     private long premiumCost;
     private int seasonDurationDays;
     private int currentSeason;
@@ -37,6 +38,7 @@ public class Config {
         this.defeatXP = Constants.DEFAULT_DEFEAT_XP;
         this.evolveXP = Constants.DEFAULT_EVOLVE_XP;
         this.levelUpXP = Constants.DEFAULT_LEVELUP_XP;
+        this.firstCatchXP = Constants.DEFAULT_FIRST_CATCH_XP;
         this.premiumCost = Constants.DEFAULT_PREMIUM_COST;
         this.seasonDurationDays = 60;
         this.currentSeason = 0;
@@ -74,6 +76,7 @@ public class Config {
         defeatXP = getOrDefault(json, "defeatXP", Constants.DEFAULT_DEFEAT_XP);
         evolveXP = getOrDefault(json, "evolveXP", Constants.DEFAULT_EVOLVE_XP);
         levelUpXP = getOrDefault(json, "levelUpXP", Constants.DEFAULT_LEVELUP_XP);
+        firstCatchXP = getOrDefault(json, "firstCatchXP", Constants.DEFAULT_FIRST_CATCH_XP);
         premiumCost = getOrDefault(json, "premiumCost", Constants.DEFAULT_PREMIUM_COST);
         seasonDurationDays = getOrDefault(json, "seasonDurationDays", 60);
         currentSeason = getOrDefault(json, "currentSeason", 0);
@@ -110,6 +113,7 @@ public class Config {
         json.addProperty("defeatXP", defeatXP);
         json.addProperty("evolveXP", evolveXP);
         json.addProperty("levelUpXP", levelUpXP);
+        json.addProperty("firstCatchXP", firstCatchXP);
         json.addProperty("premiumCost", premiumCost);
         json.addProperty("seasonDurationDays", seasonDurationDays);
         json.addProperty("currentSeason", currentSeason);
@@ -129,6 +133,7 @@ public class Config {
     public int getDefeatXP() { return defeatXP; }
     public int getEvolveXP() { return evolveXP; }
     public int getLevelUpXP() { return levelUpXP; }
+    public int getFirstCatchXP() { return firstCatchXP; }
     public long getPremiumCost() { return premiumCost; }
     public int getCurrentSeason() { return currentSeason; }
     public boolean isEnablePermissionNodes() { return enablePermissionNodes; }

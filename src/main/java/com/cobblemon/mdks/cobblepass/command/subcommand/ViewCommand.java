@@ -172,8 +172,9 @@ public class ViewCommand extends Subcommand {
             Component.literal("§7Gana XP completando tareas:"),
             Component.literal(""),
             Component.literal("§a✦ Capturar Pokémon: §f+" + CobblePass.config.getCatchXP() + " XP"),
+            Component.literal("§6✦ Primera captura: §f+" + CobblePass.config.getFirstCatchXP() + " XP bonus"),
             Component.literal("§c✦ Derrotar Pokémon: §f+" + CobblePass.config.getDefeatXP() + " XP"),
-            Component.literal("§6✦ Evolucionar Pokémon: §f+" + CobblePass.config.getEvolveXP() + " XP"),
+            Component.literal("§e✦ Evolucionar Pokémon: §f+" + CobblePass.config.getEvolveXP() + " XP"),
             Component.literal("§b✦ Subir nivel Pokémon: §f+" + CobblePass.config.getLevelUpXP() + " XP")
         ));
 

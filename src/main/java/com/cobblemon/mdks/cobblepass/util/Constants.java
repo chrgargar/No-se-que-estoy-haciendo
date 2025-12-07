@@ -46,6 +46,7 @@ public class Constants {
     public static final int DEFAULT_DEFEAT_XP = 50;
     public static final int DEFAULT_EVOLVE_XP = 150;
     public static final int DEFAULT_LEVELUP_XP = 75;
+    public static final int DEFAULT_FIRST_CATCH_XP = 200;
     public static final long DEFAULT_PREMIUM_COST = 1000;
     public static final boolean DEFAULT_ENABLE_PERMISSION_NODES = true;
     

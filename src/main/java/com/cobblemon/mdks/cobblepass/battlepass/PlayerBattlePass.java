@@ -17,6 +17,7 @@ public class PlayerBattlePass {
     private boolean isPremium;
     private final Set<Integer> claimedFreeRewards;
     private final Set<Integer> claimedPremiumRewards;
+    private final Set<String> caughtSpecies;
 
     public PlayerBattlePass(UUID playerId) {
         this.playerId = playerId;
@@ -26,6 +27,7 @@ public class PlayerBattlePass {
         this.isPremium = false;
         this.claimedFreeRewards = new HashSet<>();
         this.claimedPremiumRewards = new HashSet<>();
+        this.caughtSpecies = new HashSet<>();
     }
 
     public void addXP(int amount) {
@@ -60,6 +62,14 @@ public class PlayerBattlePass {
         this.isPremium = premium;
     }
 
+    public boolean hasCaughtSpecies(String species) {
+        return caughtSpecies.contains(species.toLowerCase());
+    }
+
+    public void addCaughtSpecies(String species) {
+        caughtSpecies.add(species.toLowerCase());
+    }
+
     public boolean hasClaimedFreeReward(int level) {
         return claimedFreeRewards.contains(level);
     }
@@ -83,6 +93,10 @@ public class PlayerBattlePass {
         claimedPremiumRewards.forEach(premiumRewards::add);
         json.add("claimedPremiumRewards", premiumRewards);
 
+        JsonArray species = new JsonArray();
+        caughtSpecies.forEach(species::add);
+        json.add("caughtSpecies", species);
+
         return json;
     }
 
@@ -102,6 +116,12 @@ public class PlayerBattlePass {
         if (json.has("claimedPremiumRewards")) {
             json.get("claimedPremiumRewards").getAsJsonArray()
                     .forEach(e -> claimedPremiumRewards.add(e.getAsInt()));
+        }
+
+        caughtSpecies.clear();
+        if (json.has("caughtSpecies")) {
+            json.get("caughtSpecies").getAsJsonArray()
+                    .forEach(e -> caughtSpecies.add(e.getAsString()));
         }
     }
 
