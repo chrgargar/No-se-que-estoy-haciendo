@@ -121,6 +121,12 @@ public class BattlePass {
         }
 
         PlayerBattlePass pass = getPlayerPass(player);
+
+        // Apply premium bonus if player has premium
+        if (pass.isPremium()) {
+            amount = (int)(amount * 1.1); // 10% bonus
+        }
+
         int oldLevel = pass.getLevel();
         pass.addXP(amount);
         int newLevel = pass.getLevel();

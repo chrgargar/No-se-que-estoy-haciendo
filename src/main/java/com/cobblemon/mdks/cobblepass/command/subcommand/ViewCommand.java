@@ -171,7 +171,9 @@ public class ViewCommand extends Subcommand {
             Component.literal("§6✦ Primera captura: §f+" + CobblePass.config.getFirstCatchXP() + " XP bonus"),
             Component.literal("§c✦ Derrotar Pokémon: §f+" + CobblePass.config.getDefeatXP() + " XP"),
             Component.literal("§e✦ Evolucionar Pokémon: §f+" + CobblePass.config.getEvolveXP() + " XP"),
-            Component.literal("§b✦ Subir nivel Pokémon: §f+" + CobblePass.config.getLevelUpXP() + " XP")
+            Component.literal("§b✦ Subir nivel Pokémon: §f+" + CobblePass.config.getLevelUpXP() + " XP"),
+            Component.literal(""),
+            Component.literal("§d✨ Jugadores Premium: §f+10% XP en todas las acciones")
         ));
 
         GooeyButton xpInfoButton = GooeyButton.builder()
