@@ -146,4 +146,22 @@ public class PlayerBattlePass {
     public boolean hasPremium() { return isPremium; }
     public Set<Integer> getClaimedFreeRewards() { return new HashSet<>(claimedFreeRewards); }
     public Set<Integer> getClaimedPremiumRewards() { return new HashSet<>(claimedPremiumRewards); }
+    public Set<String> getCaughtSpecies() { return new HashSet<>(caughtSpecies); }
+
+    /**
+     * Load player data from database
+     */
+    public void loadFromDatabase(String version, int level, int xp, boolean isPremium,
+                                  Set<Integer> freeRewards, Set<Integer> premiumRewards, Set<String> species) {
+        this.version = version;
+        this.level = level;
+        this.xp = xp;
+        this.isPremium = isPremium;
+        this.claimedFreeRewards.clear();
+        this.claimedFreeRewards.addAll(freeRewards);
+        this.claimedPremiumRewards.clear();
+        this.claimedPremiumRewards.addAll(premiumRewards);
+        this.caughtSpecies.clear();
+        this.caughtSpecies.addAll(species);
+    }
 }

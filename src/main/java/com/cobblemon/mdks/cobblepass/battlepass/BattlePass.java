@@ -1,6 +1,7 @@
 package com.cobblemon.mdks.cobblepass.battlepass;
 
 import com.cobblemon.mdks.cobblepass.CobblePass;
+import com.cobblemon.mdks.cobblepass.database.DatabaseManager;
 import com.cobblemon.mdks.cobblepass.util.Constants;
 import com.cobblemon.mdks.cobblepass.util.Utils;
 import com.cobblemon.mdks.cobblepass.config.TierConfig;
@@ -8,73 +9,67 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class BattlePass {
     private final Map<UUID, PlayerBattlePass> playerPasses = new HashMap<>();
     private TierConfig tierConfig;
+    private final DatabaseManager databaseManager;
 
     public BattlePass() {
         this.tierConfig = new TierConfig();
-        // Ensure player data directory exists
-        File playerDir = new File(Constants.PLAYER_DATA_DIR);
-        if (!playerDir.exists()) {
-            playerDir.mkdirs();
-        }
+        this.databaseManager = new DatabaseManager();
     }
 
     public void init() {
-        // Load player data
-        File playerDir = new File(Constants.PLAYER_DATA_DIR);
-        if (playerDir.exists() && playerDir.isDirectory()) {
-            File[] files = playerDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile() && file.getName().endsWith(".json")) {
-                        loadPlayerPass(file.getName().replace(".json", ""));
-                    }
-                }
-            }
+        // Initialize database connection
+        databaseManager.initialize();
+
+        // Migrate legacy JSON files if they exist
+        migrateLegacyData();
+
+        // Load all player data from database
+        List<PlayerBattlePass> players = databaseManager.loadAllPlayers();
+        for (PlayerBattlePass pass : players) {
+            playerPasses.put(pass.getPlayerId(), pass);
         }
+        CobblePass.LOGGER.info("Loaded " + players.size() + " player battle passes from database");
     }
 
     public void loadPlayerPass(String uuid) {
-        String filename = uuid + ".json";
-        String content = Utils.readFileSync(Constants.PLAYER_DATA_DIR, filename);
-        UUID playerId = UUID.fromString(uuid); // Optimización: parsear UUID solo una vez
+        UUID playerId = UUID.fromString(uuid);
 
-        if (content == null || content.isEmpty()) {
-            // Create new player pass if file doesn't exist
-            PlayerBattlePass newPass = new PlayerBattlePass(playerId);
-            playerPasses.put(playerId, newPass);
+        // Check if already loaded in memory
+        if (playerPasses.containsKey(playerId)) {
+            return;
+        }
+
+        // Try to load from database
+        PlayerBattlePass pass = databaseManager.loadPlayer(playerId);
+
+        if (pass == null) {
+            // Create new player pass if not in database
+            pass = new PlayerBattlePass(playerId);
+            playerPasses.put(playerId, pass);
             // Save the new pass immediately
             savePlayerPass(uuid);
             return;
         }
 
-        try {
-            JsonObject json = JsonParser.parseString(content).getAsJsonObject();
-            PlayerBattlePass pass = new PlayerBattlePass(playerId);
-            pass.fromJson(json);
-            playerPasses.put(playerId, pass);
-            CobblePass.LOGGER.debug("Loaded battle pass for " + uuid + " with level " + pass.getLevel() + " and XP " + pass.getXP());
-        } catch (Exception e) {
-            CobblePass.LOGGER.error("Failed to load battle pass for " + uuid, e);
-        }
+        playerPasses.put(playerId, pass);
+        CobblePass.LOGGER.debug("Loaded battle pass for " + uuid + " with level " + pass.getLevel() + " and XP " + pass.getXP());
     }
 
     public void savePlayerPass(String uuid) {
-        UUID playerId = UUID.fromString(uuid); // Optimización: parsear UUID solo una vez
+        UUID playerId = UUID.fromString(uuid);
         PlayerBattlePass pass = playerPasses.get(playerId);
         if (pass != null) {
-            String filename = uuid + ".json";
-            Utils.writeFileSync(Constants.PLAYER_DATA_DIR, filename,
-                    Utils.getGson().toJson(pass.toJson())); // Optimización: usar singleton Gson
+            databaseManager.savePlayer(pass);
             CobblePass.LOGGER.debug("Saved battle pass for " + uuid + " with level " + pass.getLevel() + " and XP " + pass.getXP());
         }
     }
@@ -90,12 +85,11 @@ public class BattlePass {
     }
 
     public void save() {
-        for (Map.Entry<UUID, PlayerBattlePass> entry : playerPasses.entrySet()) {
-            String filename = entry.getKey() + ".json";
-            Utils.writeFileSync(Constants.PLAYER_DATA_DIR, filename,
-                    Utils.newGson().toJson(entry.getValue().toJson()));
+        for (PlayerBattlePass pass : playerPasses.values()) {
+            databaseManager.savePlayer(pass);
         }
         tierConfig.save();
+        CobblePass.LOGGER.info("Saved " + playerPasses.size() + " player battle passes to database");
     }
 
     public PlayerBattlePass getPlayerPass(ServerPlayer player) {
@@ -214,21 +208,67 @@ public class BattlePass {
         // Clear in-memory player data
         playerPasses.clear();
 
-        // Delete all player data files
+        // Delete all player data from database
+        databaseManager.deleteAllPlayers();
+
+        CobblePass.LOGGER.info("All player battle pass data has been reset");
+    }
+
+    /**
+     * Migrate legacy JSON files to database
+     */
+    private void migrateLegacyData() {
         File playerDir = new File(Constants.PLAYER_DATA_DIR);
-        if (playerDir.exists() && playerDir.isDirectory()) {
-            File[] files = playerDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile() && file.getName().endsWith(".json")) {
+        if (!playerDir.exists() || !playerDir.isDirectory()) {
+            return;
+        }
+
+        File[] files = playerDir.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
+
+        int migrated = 0;
+        for (File file : files) {
+            if (file.isFile() && file.getName().endsWith(".json")) {
+                String uuid = file.getName().replace(".json", "");
+                String content = Utils.readFileSync(Constants.PLAYER_DATA_DIR, file.getName());
+
+                if (content != null && !content.isEmpty()) {
+                    try {
+                        UUID playerId = UUID.fromString(uuid);
+                        JsonObject json = JsonParser.parseString(content).getAsJsonObject();
+                        PlayerBattlePass pass = new PlayerBattlePass(playerId);
+                        pass.fromJson(json);
+
+                        // Save to database
+                        databaseManager.savePlayer(pass);
+                        migrated++;
+
+                        // Delete the JSON file after successful migration
                         if (file.delete()) {
-                            CobblePass.LOGGER.debug("Deleted player data file: " + file.getName());
+                            CobblePass.LOGGER.debug("Migrated and deleted legacy file: " + file.getName());
                         }
+                    } catch (Exception e) {
+                        CobblePass.LOGGER.error("Failed to migrate legacy data for " + uuid, e);
                     }
                 }
             }
         }
 
-        CobblePass.LOGGER.info("All player battle pass data has been reset");
+        if (migrated > 0) {
+            CobblePass.LOGGER.info("Migrated " + migrated + " player records from JSON files to database");
+        }
+    }
+
+    /**
+     * Close database connection
+     */
+    public void close() {
+        databaseManager.close();
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }

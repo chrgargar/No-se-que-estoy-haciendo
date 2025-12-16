@@ -73,10 +73,11 @@ public class CobblePass implements ModInitializer {
             CobblePass.LOGGER.info("Saved battle pass data for player " + playerName);
         });
 
-        // Register server stopping event to save all data
+        // Register server stopping event to save all data and close database
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
             CobblePass.battlePass.save();
-            CobblePass.LOGGER.info("Saved all battle pass data");
+            CobblePass.battlePass.close();
+            CobblePass.LOGGER.info("Saved all battle pass data and closed database connection");
         });
     }
 

@@ -58,6 +58,9 @@ dependencies {
 
     //Kyori API
     modImplementation("net.kyori:event-api:5.0.0-SNAPSHOT")
+
+    // SQLite Database
+    implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 }
 
 tasks.getByName<Test>("test") {
